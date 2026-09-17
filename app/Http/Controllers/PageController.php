@@ -32,4 +32,9 @@ class PageController extends Controller
             'struktur', 'berita', 'prestasi', 'galeri', 'agenda', 'anggotaAktif', 'semuaAnggota'
         ));
     }
+
+    public function about()
+    {
+        return view('about');
+    }
 }

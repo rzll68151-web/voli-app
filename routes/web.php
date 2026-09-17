@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AgendaController;
 use App\Http\Controllers\Admin\AnggotaController;
 use App\Http\Controllers\Admin\BeritaController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GaleriController;
 use App\Http\Controllers\Admin\PrestasiController;
 use App\Http\Controllers\Admin\StrukturController;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 
 // ---------- halaman publik: SATU landing page, semua section digabung ----------
 Route::get('/', [PageController::class, 'index'])->name('beranda');
+Route::get('/tentang', [PageController::class, 'about'])->name('tentang');
 
 // form pendaftaran anggota (publik, siapa aja boleh kirim)
 Route::post('/daftar/kirim', [AnggotaPendaftaranController::class, 'store'])->name('anggota.daftar');
@@ -27,6 +29,7 @@ Route::post('/admin-login', [AuthController::class, 'loginAdmin'])->name('admin.
 
 // ---------- panel admin (semua route di bawah ini wajib login + is_admin) ----------
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/struktur', [StrukturController::class, 'store'])->name('struktur.store');
     Route::put('/struktur/{struktur}', [StrukturController::class, 'update'])->name('struktur.update');
     Route::delete('/struktur/{struktur}', [StrukturController::class, 'destroy'])->name('struktur.destroy');

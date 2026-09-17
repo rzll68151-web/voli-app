@@ -54,6 +54,8 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'whatsapp' => env('VOLI_WHATSAPP'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

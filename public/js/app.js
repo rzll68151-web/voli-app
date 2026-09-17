@@ -1,3 +1,23 @@
+// ---------- intro splash screen ----------
+(function(){
+  const intro = document.getElementById('introOverlay');
+  if(!intro) return;
+
+  const seenIntro = sessionStorage.getItem('voliIntroSeen') === '1';
+  if(seenIntro){
+    intro.remove();
+    document.body.classList.remove('intro-active');
+    return;
+  }
+
+  document.body.classList.add('intro-active');
+  window.setTimeout(() => {
+    intro.classList.add('hidden');
+    document.body.classList.remove('intro-active');
+    sessionStorage.setItem('voliIntroSeen', '1');
+  }, 2200);
+})();
+
 // ---------- toast notifikasi (dipanggil dari layout blade lewat session flash) ----------
 function showToast(msg, type){
   type = type || 'ok';
@@ -49,6 +69,17 @@ document.querySelectorAll('.tab-btn').forEach(link => {
       hamburgerBtn.classList.remove('open');
       hamburgerBtn.setAttribute('aria-expanded', 'false');
     }
+  });
+});
+
+// ---------- filter galeri ----------
+document.querySelectorAll('[data-gallery-filter]').forEach(button => {
+  button.addEventListener('click', () => {
+    const filter = button.dataset.galleryFilter;
+    document.querySelectorAll('[data-gallery-filter]').forEach(item => item.classList.toggle('active', item === button));
+    document.querySelectorAll('[data-gallery-type]').forEach(item => {
+      item.classList.toggle('is-filtered', filter !== 'all' && item.dataset.galleryType !== filter);
+    });
   });
 });
 
@@ -155,4 +186,70 @@ if(lpLightbox){
   }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
 
   revealEls.forEach(el => observer.observe(el));
+})();
+
+// ---------- angka hero: naik singkat saat statistik masuk viewport ----------
+(function(){
+  const counters = document.querySelectorAll('[data-count]');
+  if(!counters.length) return;
+
+  const animateCounter = el => {
+    const target = Number(el.dataset.count || 0);
+    if(!target){ el.textContent = '0'; return; }
+    const startedAt = performance.now();
+    const duration = 700;
+    const tick = now => {
+      const progress = Math.min((now - startedAt) / duration, 1);
+      el.textContent = String(Math.round(target * (1 - Math.pow(1 - progress, 3))));
+      if(progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
+
+  if(!('IntersectionObserver' in window)){
+    counters.forEach(el => { el.textContent = el.dataset.count || '0'; });
+    return;
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        animateCounter(entry.target);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold:0.8 });
+  counters.forEach(counter => observer.observe(counter));
+})();
+
+// ---------- countdown agenda terdekat ----------
+(function(){
+  const agendaItems = document.querySelectorAll('[data-agenda-date]');
+  if(!agendaItems.length) return;
+
+  const updateCountdowns = () => {
+    agendaItems.forEach(item => {
+      const target = new Date(item.dataset.agendaDate).getTime();
+      const output = item.querySelector('.agenda-countdown');
+      if(!output || Number.isNaN(target)) return;
+      const distance = target - Date.now();
+      if(distance <= 0){ output.textContent = 'Sedang berlangsung / sudah lewat'; return; }
+      const days = Math.floor(distance / 86400000);
+      const hours = Math.floor((distance % 86400000) / 3600000);
+      output.textContent = days ? `${days} hari lagi` : `${hours} jam lagi`;
+    });
+  };
+  updateCountdowns();
+  window.setInterval(updateCountdowns, 60000);
+})();
+
+// ---------- feedback submit form pendaftaran ----------
+(function(){
+  const form = document.getElementById('registrationForm');
+  if(!form) return;
+  form.addEventListener('submit', () => {
+    form.classList.add('is-submitting');
+    const button = form.querySelector('button[type="submit"]');
+    if(button) button.innerHTML = 'Mengirim...';
+  });
 })();

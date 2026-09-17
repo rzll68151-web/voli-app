@@ -3,7 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ekskul Bola Voli — Portal Ekskul</title>
+<title>{{ request()->routeIs('tentang') ? 'Tentang Website' : 'Ekskul Bola Voli' }} — SMKN 2 Purwakarta</title>
+<meta name="description" content="Portal resmi Ekstrakurikuler Bola Voli SMKN 2 Purwakarta untuk informasi, agenda, berita, galeri, roster, dan pendaftaran anggota.">
+<meta name="theme-color" content="#10284d">
+<meta property="og:title" content="Ekskul Bola Voli SMKN 2 Purwakarta">
+<meta property="og:description" content="Kenali tim, cek agenda, lihat dokumentasi, dan gabung ke ekstrakurikuler bola voli.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ url()->current() }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('css/style.css') }}">
@@ -12,25 +18,30 @@
 
 <nav>
   <div class="wrap">
-    <a href="{{ route('beranda') }}" class="logo"><span class="dot"></span><span class="logo-full">Voli Smk 2 Pwk</span><span class="logo-short">VOLI</span></a>
+    <a href="{{ route('beranda') }}" class="logo"><span class="dot"></span><span class="logo-full">EKSKUL VOLI</span><span class="logo-short">VOLI</span></a>
     <div class="tabs-wrap" id="tabsWrap">
       <div class="tabs" id="tabs">
-        <a class="tab-btn" href="#beranda">Beranda</a>
-        <a class="tab-btn" href="#profil">Profil</a>
-        <a class="tab-btn" href="#struktur">Struktur</a>
-        <a class="tab-btn" href="#berita">Berita</a>
-        <a class="tab-btn" href="#prestasi">Prestasi</a>
-        <a class="tab-btn" href="#galeri">Galeri</a>
-        <a class="tab-btn" href="#agenda">Agenda</a>
-        <a class="tab-btn" href="#anggota">Anggota</a>
-        <a class="tab-btn" href="#daftar">Daftar</a>
+        <a class="tab-btn" href="{{ request()->routeIs('beranda') ? '#beranda' : route('beranda').'#beranda' }}">Beranda</a>
+        <a class="tab-btn" href="{{ request()->routeIs('beranda') ? '#profil' : route('beranda').'#profil' }}">Profil</a>
+        <a class="tab-btn" href="{{ request()->routeIs('beranda') ? '#struktur' : route('beranda').'#struktur' }}">Struktur</a>
+        <a class="tab-btn" href="{{ request()->routeIs('beranda') ? '#berita' : route('beranda').'#berita' }}">Berita</a>
+        <a class="tab-btn" href="{{ request()->routeIs('beranda') ? '#prestasi' : route('beranda').'#prestasi' }}">Prestasi</a>
+        <a class="tab-btn" href="{{ request()->routeIs('beranda') ? '#galeri' : route('beranda').'#galeri' }}">Galeri</a>
+        <a class="tab-btn" href="{{ request()->routeIs('beranda') ? '#agenda' : route('beranda').'#agenda' }}">Agenda</a>
+        <a class="tab-btn" href="{{ request()->routeIs('beranda') ? '#anggota' : route('beranda').'#anggota' }}">Anggota</a>
+        <a class="tab-btn" href="{{ route('tentang') }}">Tentang</a>
+        <a class="tab-btn" href="{{ request()->routeIs('beranda') ? '#daftar' : route('beranda').'#daftar' }}">Daftar</a>
       </div>
     </div>
     <div class="nav-right-group">
+      @if(request()->routeIs('admin.dashboard'))
+        <a class="link-btn" href="{{ route('beranda') }}">Kembali ke landing</a>
+      @endif
       <div class="auth-slot">
         @auth
           @if(auth()->user()->is_admin)
             <span class="badge">ADMIN</span>
+            <a class="link-btn" href="{{ route('admin.dashboard') }}">Dashboard</a>
             <form method="POST" action="{{ route('logout') }}" style="display:inline;">
               @csrf
               <button type="submit" class="link-btn" style="background:none;">Keluar</button>
@@ -62,12 +73,29 @@
   <script>window.addEventListener('DOMContentLoaded', () => showToast(@json($errors->first()), 'err'));</script>
 @endif
 
+<div class="intro-overlay" id="introOverlay" aria-hidden="true">
+  <div class="intro-glow intro-glow-one"></div>
+  <div class="intro-glow intro-glow-two"></div>
+  <div class="intro-logo-wrap">
+    <span class="intro-badge">SMKN 2 PURWAKARTA</span>
+    <div class="intro-wordmark" aria-label="Ekskul Voli">
+      <span class="intro-word">EKSKUL</span>
+      <span class="intro-word intro-word-accent">VOLI</span>
+    </div>
+    <div class="intro-line"></div>
+    <p class="intro-subtitle">MAIN NYATA • GAK NGASAL • BANGKIT</p>
+  </div>
+</div>
+
 <main>
   @yield('content')
 </main>
 
 <footer>
-Portal Ekstrakurikuler Bola Voli
+  <div class="footer-grid wrap">
+    <div><strong>EKSKUL VOLI</strong><span>Portal Ekstrakurikuler Bola Voli SMKN 2 Purwakarta</span></div>
+    <div><span>Latihan rutin · Sekolah · Purwakarta</span><span>Diusulkan oleh Rizal Andhika Wijaya — XII RPL</span></div>
+  </div>
   <div style="margin-top:12px;">
     <a href="https://www.instagram.com/volleyball.smekda" target="_blank" rel="noopener" aria-label="Instagram @volleyball.smekda" style="display:inline-flex; color:var(--court-wood);">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -78,6 +106,10 @@ Portal Ekstrakurikuler Bola Voli
     </a>
   </div>
 </footer>
+
+@if(config('app.whatsapp'))
+  <a class="whatsapp-float" href="https://wa.me/{{ preg_replace('/\D+/', '', config('app.whatsapp')) }}" target="_blank" rel="noopener" aria-label="Hubungi pembina lewat WhatsApp">WhatsApp <span>↗</span></a>
+@endif
 
 {{-- modal login admin: tersembunyi, cuma dibuka lewat ?admin di URL atau ngetik "admin" di keyboard --}}
 <div id="loginAdminOverlay" style="display:none; position:fixed; inset:0; background:rgba(12,24,48,0.8); z-index:100; align-items:center; justify-content:center; padding:20px;">
